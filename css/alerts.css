@@ -1,0 +1,209 @@
+/* ============================================================
+   YORU LIVE OVERLAY — ALERTS
+   Follow / Gift / Subscriber notifications
+   ============================================================ */
+
+#yoru-alerts {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 380px;
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Base alert card ── */
+.yoru-alert {
+  position: relative;
+  background: rgba(10, 10, 13, 0.94);
+  border: 1px solid var(--yoru-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 18px 20px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  /* cinematic sweep-in from right */
+  animation: alertIn 500ms var(--ease-out) both;
+}
+
+.yoru-alert.alert-exiting {
+  animation: alertOut 500ms var(--ease-in) forwards;
+}
+
+/* ── Top accent bar (color-coded per type) ── */
+.yoru-alert::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.yoru-alert.alert-follow     { border-color: rgba(227,38,54,0.3); }
+.yoru-alert.alert-follow::before   { background: var(--yoru-accent); }
+
+.yoru-alert.alert-gift       { border-color: rgba(255,185,30,0.3); }
+.yoru-alert.alert-gift::before     { background: linear-gradient(90deg, #FFB91E, #FF7A00); }
+
+.yoru-alert.alert-subscriber { border-color: rgba(130,100,255,0.3); }
+.yoru-alert.alert-subscriber::before { background: linear-gradient(90deg, #8264FF, #BBA4FF); }
+
+/* ── Background light bleed ── */
+.alert-bg-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  pointer-events: none;
+}
+.alert-follow     .alert-bg-glow { background: radial-gradient(ellipse at 20% 50%, var(--yoru-accent), transparent 70%); }
+.alert-gift       .alert-bg-glow { background: radial-gradient(ellipse at 20% 50%, #FFB91E, transparent 70%); }
+.alert-subscriber .alert-bg-glow { background: radial-gradient(ellipse at 20% 50%, #8264FF, transparent 70%); }
+
+/* ── Inner layout ── */
+.alert-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+/* ── Icon area ── */
+.alert-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.alert-follow     .alert-icon-wrap { background: var(--yoru-accent-dim); }
+.alert-gift       .alert-icon-wrap { background: rgba(255,185,30,0.12); }
+.alert-subscriber .alert-icon-wrap { background: rgba(130,100,255,0.12); }
+
+.alert-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* ── Avatar inside icon wrap ── */
+.alert-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--yoru-surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--yoru-silver);
+  flex-shrink: 0;
+}
+.alert-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Text content ── */
+.alert-content {
+  min-width: 0;
+}
+
+.alert-type-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.alert-follow     .alert-type-label { color: var(--yoru-accent); }
+.alert-gift       .alert-type-label { color: #FFB91E; }
+.alert-subscriber .alert-type-label { color: #BBA4FF; }
+
+.alert-username {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--yoru-white);
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alert-subtext {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--yoru-silver);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* Gift quantity badge */
+.alert-qty {
+  display: inline-block;
+  background: rgba(255,185,30,0.15);
+  color: #FFB91E;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 1px 7px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ── Progress bar (shows time remaining) ── */
+.alert-timer {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  animation: timerDrain linear forwards;
+}
+
+/* ── Animations ── */
+@keyframes alertIn {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes alertOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-height: 120px;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(24px) scale(0.95);
+    max-height: 0;
+    margin-bottom: -12px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@keyframes timerDrain {
+  from { width: 100%; }
+  to   { width: 0%; }
+}

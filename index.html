@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YORU — Overlay Control Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/chatbox.css">
+  <link rel="stylesheet" href="css/follower-goal.css">
+  <link rel="stylesheet" href="css/alerts.css">
+
+  <style>
+    /* ── Dashboard shell ── */
+    body.dashboard-page {
+      display: grid;
+      grid-template-rows: 56px 1fr;
+      grid-template-columns: 260px 1fr 300px;
+      height: 100vh;
+      overflow: hidden;
+      background: #08080B;
+      color: var(--yoru-white);
+      font-family: var(--font-body);
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      grid-column: 1 / -1;
+      background: var(--yoru-bg);
+      border-bottom: 1px solid var(--yoru-border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 20px;
+      position: relative;
+      z-index: 50;
+    }
+
+    .topbar-logo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--yoru-white);
+    }
+    .topbar-logo span { color: var(--yoru-accent); }
+
+    .topbar-sep {
+      width: 1px; height: 24px;
+      background: var(--yoru-border);
+      flex-shrink: 0;
+    }
+
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--yoru-silver);
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #555;
+      transition: background 0.4s;
+    }
+    .status-dot.connected    { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.5); }
+    .status-dot.disconnected { background: #E32636; }
+
+    .topbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      background: var(--yoru-bg);
+      border-right: 1px solid var(--yoru-border);
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .sidebar-section-title {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--yoru-silver);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--yoru-border);
+      margin-bottom: 10px;
+    }
+
+    /* ── Control buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: all 180ms ease;
+      text-decoration: none;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .btn-accent {
+      background: var(--yoru-accent);
+      color: white;
+    }
+    .btn-accent:hover { background: #c7202d; }
+
+    .btn-ghost {
+      background: var(--yoru-surface);
+      color: var(--yoru-white);
+      border: 1px solid var(--yoru-border);
+    }
+    .btn-ghost:hover { background: var(--yoru-surface-alt); border-color: rgba(255,255,255,0.14); }
+
+    .btn-sm {
+      font-size: 11px;
+      padding: 6px 11px;
+    }
+
+    .btn-gift {
+      background: rgba(255,185,30,0.12);
+      color: #FFB91E;
+      border: 1px solid rgba(255,185,30,0.2);
+    }
+    .btn-gift:hover { background: rgba(255,185,30,0.2); }
+
+    .btn-sub {
+      background: rgba(130,100,255,0.12);
+      color: #BBA4FF;
+      border: 1px solid rgba(130,100,255,0.2);
+    }
+    .btn-sub:hover { background: rgba(130,100,255,0.2); }
+
+    .btn-danger {
+      background: rgba(227,38,54,0.1);
+      color: var(--yoru-accent);
+      border: 1px solid rgba(227,38,54,0.2);
+    }
+    .btn-danger:hover { background: rgba(227,38,54,0.2); }
+
+    .btn-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── Form controls ── */
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .ctrl-label {
+      font-size: 11px;
+      color: var(--yoru-silver);
+      font-family: var(--font-display);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .ctrl-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type="number"],
+    input[type="range"],
+    input[type="color"] {
+      background: var(--yoru-surface-alt);
+      border: 1px solid var(--yoru-border);
+      border-radius: var(--radius-sm);
+      color: var(--yoru-white);
+      font-family: var(--font-body);
+      font-size: 13px;
+      padding: 6px 9px;
+      outline: none;
+      width: 100%;
+    }
+    input[type="number"]:focus,
+    input[type="range"]:focus {
+      border-color: rgba(227,38,54,0.5);
+    }
+    input[type="number"] { width: 80px; }
+    input[type="color"]  { width: 42px; height: 32px; padding: 2px 4px; cursor: pointer; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--yoru-surface-alt);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--yoru-accent);
+    }
+
+    .range-val {
+      font-size: 12px;
+      color: var(--yoru-accent);
+      font-family: var(--font-display);
+      font-weight: 600;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ── Preview area ── */
+    .preview-area {
+      position: relative;
+      background: #0D0D10;
+      overflow: hidden;
+    }
+
+    /* Fake gameplay background */
+    .preview-game-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 60%, rgba(30,20,60,0.5) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 30%, rgba(10,20,40,0.6) 0%, transparent 55%),
+        linear-gradient(135deg, #0D0D15 0%, #080810 50%, #0F0A0D 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-game-hint {
+      text-align: center;
+      opacity: 0.08;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .preview-game-hint h2 {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: white;
+    }
+
+    .preview-game-hint p {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      color: white;
+      margin-top: 4px;
+    }
+
+    /* Overlay widgets sit inside preview */
+    .preview-widgets {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Position overrides for dashboard preview */
+    .preview-area #yoru-chatbox {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 340px;
+      pointer-events: none;
+    }
+
+    .preview-area #yoru-follower-goal {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 360px;
+      pointer-events: none;
+    }
+
+    .preview-area #yoru-alerts {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: 320px;
+      pointer-events: none;
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+      background: var(--yoru-bg);
+      border-left: 1px solid var(--yoru-border);
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Integration status card ── */
+    .integration-card {
+      background: var(--yoru-surface);
+      border: 1px solid var(--yoru-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .integration-card-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--yoru-silver);
+      margin-bottom: 10px;
+    }
+
+    .integration-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--yoru-border);
+      font-size: 13px;
+    }
+    .integration-row:last-child { border-bottom: none; }
+
+    .integration-label { color: var(--yoru-silver); }
+    .integration-state { font-family: var(--font-display); font-size: 12px; font-weight: 600; }
+    .integration-state.ok  { color: #4caf50; }
+    .integration-state.off { color: var(--yoru-silver); opacity: 0.5; }
+    .integration-state.na  { color: #666; }
+
+    /* ── Overlay links ── */
+    .overlay-link-card {
+      background: var(--yoru-surface);
+      border: 1px solid var(--yoru-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .overlay-link-card:hover { border-color: rgba(227,38,54,0.4); }
+
+    .overlay-link-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--yoru-white);
+    }
+    .overlay-link-url {
+      font-size: 11px;
+      color: var(--yoru-silver);
+      margin-top: 2px;
+    }
+    .overlay-link-arrow {
+      color: var(--yoru-accent);
+      font-size: 16px;
+    }
+
+    /* ── Demo speed toggle ── */
+    .demo-badge {
+      display: inline-block;
+      background: rgba(227,38,54,0.15);
+      color: var(--yoru-accent);
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .demo-badge.live {
+      background: rgba(76,175,80,0.15);
+      color: #4caf50;
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    /* ── Scroll fix for sidebars ── */
+    .sidebar, .right-panel {
+      scrollbar-width: thin;
+      scrollbar-color: var(--yoru-surface-alt) transparent;
+    }
+  </style>
+</head>
+
+<body class="dashboard-page">
+
+  <!-- ── Top Bar ── -->
+  <header class="topbar">
+    <div class="topbar-logo">YORU<span>.</span></div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-status">
+      <span class="status-dot" id="bridge-dot"></span>
+      <span id="bridge-label">Connecting to bridge…</span>
+    </div>
+    <div class="topbar-actions">
+      <span class="demo-badge" id="demo-badge">DEMO</span>
+      <button class="btn btn-ghost btn-sm" id="btn-toggle-demo" style="width:auto;">▶ Start Demo</button>
+      <button class="btn btn-accent btn-sm" id="btn-reset" style="width:auto;">Reset Defaults</button>
+    </div>
+  </header>
+
+  <!-- ── Left Sidebar: Controls ── -->
+  <aside class="sidebar">
+
+    <!-- Trigger Events -->
+    <div>
+      <div class="sidebar-section-title">Test Events</div>
+      <div class="btn-col">
+        <button class="btn btn-ghost" id="t-chat">💬 Trigger Chat</button>
+        <button class="btn btn-accent" id="t-follow">＋ Trigger Follow</button>
+        <button class="btn btn-gift" id="t-gift">🎁 Trigger Gift</button>
+        <button class="btn btn-sub" id="t-sub">★ Trigger Subscriber</button>
+      </div>
+    </div>
+
+    <!-- Follower Goal Controls -->
+    <div>
+      <div class="sidebar-section-title">Follower Goal</div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Current Followers</span>
+        <div class="ctrl-row">
+          <input type="number" id="ctrl-current" value="125" min="0">
+          <button class="btn btn-ghost btn-sm" id="btn-apply-goal" style="width:auto;flex-shrink:0;">Apply</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Target</span>
+        <input type="number" id="ctrl-target" value="200" min="1">
+      </div>
+    </div>
+
+    <!-- Chatbox Settings -->
+    <div>
+      <div class="sidebar-section-title">Chatbox</div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Font Size</span>
+        <div class="ctrl-row">
+          <input type="range" id="ctrl-font" min="11" max="22" value="14">
+          <span class="range-val" id="ctrl-font-val">14px</span>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Background Opacity</span>
+        <div class="ctrl-row">
+          <input type="range" id="ctrl-opacity" min="0.3" max="1" step="0.05" value="0.82">
+          <span class="range-val" id="ctrl-opacity-val">82%</span>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Max Messages</span>
+        <input type="number" id="ctrl-maxmsg" value="8" min="1" max="20">
+      </div>
+    </div>
+
+    <!-- Colors -->
+    <div>
+      <div class="sidebar-section-title">Colors</div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Accent Color</span>
+        <div class="ctrl-row">
+          <input type="color" id="ctrl-accent" value="#E32636">
+          <span style="font-size:12px;color:var(--yoru-silver);flex:1;padding-left:8px;" id="ctrl-accent-hex">#E32636</span>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Surface Color</span>
+        <div class="ctrl-row">
+          <input type="color" id="ctrl-surface" value="#15151B">
+          <span style="font-size:12px;color:var(--yoru-silver);flex:1;padding-left:8px;" id="ctrl-surface-hex">#15151B</span>
+        </div>
+      </div>
+
+      <button class="btn btn-danger btn-sm" id="btn-reset-colors">Reset Colors</button>
+    </div>
+
+  </aside>
+
+  <!-- ── Preview Area ── -->
+  <main class="preview-area">
+    <div class="preview-game-bg">
+      <div class="preview-game-hint">
+        <h2>YORU</h2>
+        <p>@YORUICHI.LIVE</p>
+      </div>
+    </div>
+
+    <div class="preview-widgets">
+      <!-- Follower Goal -->
+      <div id="yoru-follower-goal">
+        <div class="goal-panel">
+          <div class="goal-header">
+            <span class="goal-title">FOLLOWER GOAL</span>
+            <span class="goal-counts">
+              <span class="goal-current" id="yoru-goal-current">0</span>
+              <span class="goal-sep">/</span>
+              <span id="yoru-goal-target">200</span>
+            </span>
+          </div>
+          <div class="goal-track">
+            <div class="goal-fill" id="yoru-goal-fill"></div>
+          </div>
+          <div class="goal-pct">
+            <span class="goal-pct-value" id="yoru-goal-pct">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbox -->
+      <div id="yoru-chatbox" role="log" aria-live="polite"></div>
+
+      <!-- Alerts -->
+      <div id="yoru-alerts" aria-live="assertive"></div>
+    </div>
+  </main>
+
+  <!-- ── Right Panel: Info & Links ── -->
+  <aside class="right-panel">
+
+    <!-- Integration Status -->
+    <div>
+      <div class="sidebar-section-title">Integration Status</div>
+      <div class="integration-card">
+        <div class="integration-card-title">TikTok LIVE Events</div>
+        <div class="integration-row">
+          <span class="integration-label">Bridge Server</span>
+          <span class="integration-state off" id="int-bridge">Offline</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-label">Chat</span>
+          <span class="integration-state off" id="int-chat">—</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-label">Follows</span>
+          <span class="integration-state off" id="int-follows">—</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-label">Gifts</span>
+          <span class="integration-state off" id="int-gifts">—</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-label">Subscribers</span>
+          <span class="integration-state na" id="int-subs">Limited</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay URLs -->
+    <div>
+      <div class="sidebar-section-title">Overlay Sources</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a class="overlay-link-card" href="chatbox.html" target="_blank">
+          <div>
+            <div class="overlay-link-name">Chatbox</div>
+            <div class="overlay-link-url">chatbox.html</div>
+          </div>
+          <span class="overlay-link-arrow">↗</span>
+        </a>
+        <a class="overlay-link-card" href="follower-goal.html" target="_blank">
+          <div>
+            <div class="overlay-link-name">Follower Goal</div>
+            <div class="overlay-link-url">follower-goal.html</div>
+          </div>
+          <span class="overlay-link-arrow">↗</span>
+        </a>
+        <a class="overlay-link-card" href="alerts.html" target="_blank">
+          <div>
+            <div class="overlay-link-name">Alerts</div>
+            <div class="overlay-link-url">alerts.html</div>
+          </div>
+          <span class="overlay-link-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <div class="sidebar-section-title">Quick Notes</div>
+      <div style="font-size:12px;color:var(--yoru-silver);line-height:1.6;display:flex;flex-direction:column;gap:8px;">
+        <p>Open individual overlay files in OBS/browser source for use in TikTok LIVE Studio.</p>
+        <p>For real TikTok events, run the Node.js bridge server. See README.md for setup.</p>
+        <p>TikTok LIVE Studio has limited browser-source support — see README for alternatives.</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Scripts ── -->
+  <script src="js/config.js"></script>
+  <script src="js/chatbox.js"></script>
+  <script src="js/follower-goal.js"></script>
+  <script src="js/alerts.js"></script>
+  <script src="js/integrations.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── Override widget positions for dashboard (they read CSS vars) ──
+    const root = document.documentElement;
+
+    // Widgets use absolute positioning inside .preview-area, handled by CSS
+    // Remove the fixed-position defaults from overlay pages
+    document.getElementById('yoru-chatbox').style.position = 'absolute';
+    document.getElementById('yoru-follower-goal').style.position = 'absolute';
+    document.getElementById('yoru-alerts').style.position = 'absolute';
+
+    // ── Integration status ──
+    YoruIntegrations.onStatus(status => {
+      const dot   = document.getElementById('bridge-dot');
+      const label = document.getElementById('bridge-label');
+      const intBridge = document.getElementById('int-bridge');
+      const intChat   = document.getElementById('int-chat');
+      const intFol    = document.getElementById('int-follows');
+      const intGift   = document.getElementById('int-gifts');
+
+      if (status === 'connected') {
+        dot.className = 'status-dot connected';
+        label.textContent = 'Bridge connected';
+        intBridge.textContent = 'Online';
+        intBridge.className = 'integration-state ok';
+        [intChat, intFol, intGift].forEach(el => {
+          el.textContent = 'Live';
+          el.className = 'integration-state ok';
+        });
+      } else {
+        dot.className = 'status-dot disconnected';
+        label.textContent = 'Bridge offline — demo mode';
+        intBridge.textContent = 'Offline';
+        intBridge.className = 'integration-state off';
+        [intChat, intFol, intGift].forEach(el => {
+          el.textContent = '—';
+          el.className = 'integration-state off';
+        });
+      }
+    });
+
+    // Start bridge connection attempt
+    YoruIntegrations.init();
+
+    // Set initial status to disconnected after short delay if no connection
+    setTimeout(() => {
+      const dot = document.getElementById('bridge-dot');
+      if (!dot.classList.contains('connected')) {
+        dot.className = 'status-dot disconnected';
+        document.getElementById('bridge-label').textContent = 'Bridge offline — demo mode';
+      }
+    }, 2000);
+
+    // ── Demo toggle ──
+    let demoRunning = false;
+
+    document.getElementById('btn-toggle-demo').addEventListener('click', () => {
+      demoRunning = !demoRunning;
+      const btn   = document.getElementById('btn-toggle-demo');
+      const badge = document.getElementById('demo-badge');
+      if (demoRunning) {
+        YoruIntegrations.startDemo(2200);
+        btn.textContent = '⏹ Stop Demo';
+        badge.textContent = 'LIVE DEMO';
+        badge.className = 'demo-badge live';
+      } else {
+        YoruIntegrations.stopDemo();
+        btn.textContent = '▶ Start Demo';
+        badge.textContent = 'DEMO';
+        badge.className = 'demo-badge';
+      }
+    });
+
+    // ── Single test triggers ──
+    document.getElementById('t-chat').addEventListener('click', () => YoruIntegrations.triggerChat());
+    document.getElementById('t-follow').addEventListener('click', () => YoruIntegrations.triggerFollow());
+    document.getElementById('t-gift').addEventListener('click', () => YoruIntegrations.triggerGift());
+    document.getElementById('t-sub').addEventListener('click', () => YoruIntegrations.triggerSubscriber());
+
+    // ── Follower goal ──
+    document.getElementById('btn-apply-goal').addEventListener('click', () => {
+      const c = parseInt(document.getElementById('ctrl-current').value) || 0;
+      const t = parseInt(document.getElementById('ctrl-target').value)  || 200;
+      YoruFollowerGoal.setValues(c, t, true);
+    });
+
+    // ── Chatbox font size ──
+    const fontRange = document.getElementById('ctrl-font');
+    fontRange.addEventListener('input', () => {
+      const v = fontRange.value;
+      document.getElementById('ctrl-font-val').textContent = v + 'px';
+      root.style.setProperty('--chatbox-font', v + 'px');
+    });
+
+    // ── Chatbox opacity ──
+    const opacityRange = document.getElementById('ctrl-opacity');
+    opacityRange.addEventListener('input', () => {
+      const v = parseFloat(opacityRange.value);
+      document.getElementById('ctrl-opacity-val').textContent = Math.round(v * 100) + '%';
+      root.style.setProperty('--chatbox-opacity', v);
+    });
+
+    // ── Accent color ──
+    const accentPicker = document.getElementById('ctrl-accent');
+    accentPicker.addEventListener('input', () => {
+      const v = accentPicker.value;
+      document.getElementById('ctrl-accent-hex').textContent = v;
+      root.style.setProperty('--yoru-accent', v);
+      // Update dim/glow derived values
+      root.style.setProperty('--yoru-accent-dim',  hexToRgba(v, 0.18));
+      root.style.setProperty('--yoru-accent-glow', hexToRgba(v, 0.45));
+    });
+
+    // ── Surface color ──
+    const surfacePicker = document.getElementById('ctrl-surface');
+    surfacePicker.addEventListener('input', () => {
+      const v = surfacePicker.value;
+      document.getElementById('ctrl-surface-hex').textContent = v;
+      root.style.setProperty('--yoru-surface', v);
+    });
+
+    // ── Reset colors ──
+    document.getElementById('btn-reset-colors').addEventListener('click', () => {
+      root.style.setProperty('--yoru-accent',      '#E32636');
+      root.style.setProperty('--yoru-accent-dim',  'rgba(227,38,54,0.18)');
+      root.style.setProperty('--yoru-accent-glow', 'rgba(227,38,54,0.45)');
+      root.style.setProperty('--yoru-surface',     '#15151B');
+      accentPicker.value  = '#E32636';
+      surfacePicker.value = '#15151B';
+      document.getElementById('ctrl-accent-hex').textContent  = '#E32636';
+      document.getElementById('ctrl-surface-hex').textContent = '#15151B';
+    });
+
+    // ── Reset all ──
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      location.reload();
+    });
+
+    // ── Helper: hex → rgba ──
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b = parseInt(hex.slice(5,7),16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+  })();
+  </script>
+
+</body>
+</html>

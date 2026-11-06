@@ -1,0 +1,151 @@
+/* ============================================================
+   YORU LIVE OVERLAY — CHATBOX
+   ============================================================ */
+
+#yoru-chatbox {
+  position: fixed;
+  bottom: var(--chatbox-bottom, 20px);
+  left:   var(--chatbox-left,   20px);
+  width:  var(--chatbox-width,  420px);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--chatbox-spacing, 8px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Individual message ── */
+.chat-message {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 9px 13px;
+  background: rgba(21, 21, 27, var(--chatbox-opacity, 0.82));
+  border-radius: var(--chatbox-radius, 8px);
+  border-left: 2px solid transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: var(--chatbox-font, 14px);
+  line-height: 1.45;
+  overflow: hidden;
+  word-break: break-word;
+
+  /* Entrance: slide up + fade */
+  animation: chatEnter var(--chatbox-anim, 350ms) var(--ease-out) forwards;
+}
+
+.chat-message.chat-exiting {
+  animation: chatExit var(--chatbox-anim, 350ms) var(--ease-in) forwards;
+}
+
+/* Accent border on new messages — quickly fades */
+.chat-message.chat-fresh {
+  border-left-color: var(--yoru-accent);
+  transition: border-left-color 1.5s ease;
+}
+
+/* ── Avatar ── */
+.chat-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--yoru-surface-alt);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--yoru-silver);
+  border: 1.5px solid var(--yoru-border);
+}
+
+.chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Content ── */
+.chat-content {
+  min-width: 0;
+}
+
+.chat-username {
+  font-family: var(--font-display);
+  font-size: calc(var(--chatbox-font, 14px) * 0.93);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--yoru-accent);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Moderator / special badges */
+.chat-badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+.chat-badge-mod   { background: rgba(100,180,100,0.2); color: #7ecb7e; }
+.chat-badge-sub   { background: rgba(227,38,54,0.18);  color: var(--yoru-accent); }
+.chat-badge-owner { background: rgba(227,38,54,0.3);   color: #ff7784; }
+
+.chat-text {
+  color: var(--yoru-white);
+  font-size: var(--chatbox-font, 14px);
+  line-height: 1.45;
+}
+
+/* Emoji sizing */
+.chat-text .chat-emoji {
+  font-size: 1.2em;
+  vertical-align: -0.1em;
+}
+
+/* ── No-avatar layout ── */
+.chat-message.no-avatar {
+  grid-template-columns: 1fr;
+}
+
+/* ── Animations ── */
+@keyframes chatEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chatExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 100px;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

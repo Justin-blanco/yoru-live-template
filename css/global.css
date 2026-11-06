@@ -1,0 +1,134 @@
+/* ============================================================
+   YORU LIVE OVERLAY — GLOBAL STYLES
+   Brand system variables, resets, and shared utilities
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ── Brand Tokens ── */
+:root {
+  /* Palette */
+  --yoru-bg:          #0A0A0D;
+  --yoru-surface:     #15151B;
+  --yoru-surface-alt: #1C1C24;
+  --yoru-border:      rgba(255,255,255,0.07);
+  --yoru-accent:      #E32636;
+  --yoru-accent-dim:  rgba(227, 38, 54, 0.18);
+  --yoru-accent-glow: rgba(227, 38, 54, 0.45);
+  --yoru-silver:      #A7A7B2;
+  --yoru-white:       #F4F4F8;
+  --yoru-muted:       rgba(244,244,248,0.45);
+
+  /* Typography */
+  --font-display: 'Rajdhani', 'Arial Narrow', sans-serif;
+  --font-body:    'Inter', 'Helvetica Neue', sans-serif;
+
+  /* Type scale */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   22px;
+  --text-xl:   28px;
+  --text-2xl:  36px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:  cubic-bezier(0.7, 0, 0.84, 0);
+  --dur-fast: 180ms;
+  --dur-mid:  360ms;
+  --dur-slow: 560ms;
+
+  /* Overlay widget defaults (overridden per-component) */
+  --widget-opacity: 1;
+  --widget-scale:   1;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--yoru-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Overlay pages: fully transparent for browser-source use */
+body.overlay-page {
+  background: transparent !important;
+  overflow: hidden;
+}
+
+/* Dashboard page */
+body.dashboard-page {
+  background: #08080B;
+  min-height: 100vh;
+}
+
+/* ── Utility classes ── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  clip: rect(0,0,0,0);
+  overflow: hidden;
+}
+
+.yoru-label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--yoru-silver);
+}
+
+.yoru-accent-text {
+  color: var(--yoru-accent);
+}
+
+/* ── Shared accent line ── */
+.yoru-accent-line {
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--yoru-accent);
+  border-radius: 1px;
+}
+
+/* ── Scrollbar (for dashboard) ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--yoru-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--yoru-surface-alt);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--yoru-silver); }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

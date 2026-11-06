@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YORU — Follower Goal Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/follower-goal.css">
+  <style>
+    body { background: transparent; overflow: hidden; }
+  </style>
+</head>
+<body class="overlay-page">
+
+  <div id="yoru-follower-goal">
+    <div class="goal-panel">
+      <div class="goal-header">
+        <span class="goal-title">FOLLOWER GOAL</span>
+        <span class="goal-counts">
+          <span class="goal-current" id="yoru-goal-current">0</span>
+          <span class="goal-sep">/</span>
+          <span id="yoru-goal-target">200</span>
+        </span>
+      </div>
+      <div class="goal-track">
+        <div class="goal-fill" id="yoru-goal-fill"></div>
+      </div>
+      <div class="goal-pct">
+        <span class="goal-pct-value" id="yoru-goal-pct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/follower-goal.js"></script>
+  <script src="js/integrations.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      YoruIntegrations.init();
+    });
+  </script>
+</body>
+</html>

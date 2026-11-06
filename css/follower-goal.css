@@ -1,0 +1,139 @@
+/* ============================================================
+   YORU LIVE OVERLAY — FOLLOWER GOAL
+   ============================================================ */
+
+#yoru-follower-goal {
+  position: fixed;
+  top:  var(--goal-top,  20px);
+  left: var(--goal-left, 20px);
+  width: var(--goal-width, 480px);
+  pointer-events: none;
+  z-index: 10;
+  animation: goalEnter 600ms var(--ease-out) both;
+}
+
+.goal-panel {
+  background: rgba(21, 21, 27, 0.88);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--yoru-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 14px 18px 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Subtle left accent stripe */
+.goal-panel::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--yoru-accent);
+}
+
+/* ── Header row ── */
+.goal-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.goal-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--yoru-silver);
+  text-transform: uppercase;
+}
+
+.goal-counts {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--yoru-white);
+  letter-spacing: 0.03em;
+}
+
+.goal-counts .goal-current {
+  color: var(--yoru-accent);
+}
+
+.goal-counts .goal-sep {
+  color: var(--yoru-muted);
+  margin: 0 3px;
+}
+
+/* ── Track ── */
+.goal-track {
+  position: relative;
+  height: 6px;
+  background: var(--yoru-surface-alt);
+  border-radius: 3px;
+  overflow: visible;
+  margin-bottom: 8px;
+}
+
+.goal-fill {
+  height: 100%;
+  background: var(--yoru-accent);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 800ms var(--ease-out);
+  position: relative;
+}
+
+/* Glow on the fill */
+.goal-fill.glow-enabled::after {
+  content: '';
+  position: absolute;
+  right: -2px; top: -3px;
+  width: 10px; height: 12px;
+  border-radius: 50%;
+  background: var(--yoru-accent);
+  box-shadow: 0 0 10px 4px var(--yoru-accent-glow);
+  opacity: 0.9;
+}
+
+/* ── Percent label ── */
+.goal-pct {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.goal-pct-value {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--yoru-silver);
+}
+
+/* ── Completion state ── */
+.goal-panel.goal-complete .goal-fill {
+  background: linear-gradient(90deg, var(--yoru-accent), #ff9fa6);
+  animation: completePulse 1.2s ease-in-out infinite alternate;
+}
+
+.goal-panel.goal-complete .goal-counts .goal-current {
+  animation: completePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes completePulse {
+  from { opacity: 1; }
+  to   { opacity: 0.7; }
+}
+
+/* ── Entrance ── */
+@keyframes goalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
